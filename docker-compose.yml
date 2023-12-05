@@ -1,0 +1,54 @@
+version: "3"
+services:
+  cache:
+    container_name: "${APP_NAME:-directus}-cache"
+    image: redis:6
+  directus:
+    container_name: "${APP_NAME:-directus}-app"
+    build:
+      context: ./
+    ports:
+      - 8055:8055
+    volumes:
+      - ./snapshots:/directus/snapshots
+      - ./uploads:/directus/uploads
+      - ./extensions:/directus/extensions
+    depends_on:
+      - cache
+    environment:
+      KEY: "${KEY}"
+      SECRET: "${SECRET}"
+
+      EXTENSIONS_AUTO_RELOAD: ${EXTENSIONS_AUTO_RELOAD}
+
+      DB_CLIENT: "${DB_CLIENT:-pg}"
+      DB_HOST: "${DB_HOST:-localhost}"
+      DB_PORT: "${DB_PORT:-5432}"
+      DB_DATABASE: "${DB_DATABASE-:postgres}"
+      DB_USER: "${DB_USER:-postgres}"
+      DB_PASSWORD: "${DB_PASSWORD}"
+      DB_SSL: "${DB_SSL}"
+
+      AUTH_PROVIDERS: "${AUTH_PROVIDERS}"
+
+      AUTH_GOOGLE_DRIVER: "${AUTH_GOOGLE_DRIVER}"
+      AUTH_GOOGLE_CLIENT_ID: "${AUTH_GOOGLE_CLIENT_ID}"
+      AUTH_GOOGLE_CLIENT_SECRET: "${AUTH_GOOGLE_CLIENT_SECRET}"
+      AUTH_GOOGLE_ISSUER_URL: "${AUTH_GOOGLE_ISSUER_URL}"
+      AUTH_GOOGLE_IDENTIFIER_KEY: "${AUTH_GOOGLE_IDENTIFIER_KEY}"
+      AUTH_GOOGLE_ICON: "${AUTH_GOOGLE_ICON}"
+      AUTH_GOOGLE_LABEL: "${AUTH_GOOGLE_LABEL}"
+      AUTH_GOOGLE_ALLOW_PUBLIC_REGISTRATION: "${AUTH_GOOGLE_ALLOW_PUBLIC_REGISTRATION:-false}"
+
+      CACHE_ENABLED: "${CACHE_ENABLED:-false}"
+      CACHE_STORE: "${CACHE_STORE:-memory}"
+      REDIS: "redis://cache:6379"
+
+      CONTENT_SECURITY_POLICY_directives__child-src: "${CONTENT_SECURITY_POLICY_directives__child-src}"
+
+      ADMIN_EMAIL: "admin@example.com"
+      ADMIN_PASSWORD: "directus"
+
+      # Make sure to set this in production
+      # (see https://docs.directus.io/self-hosted/config-options#general)
+      # PUBLIC_URL: "https://directus.example.com"
